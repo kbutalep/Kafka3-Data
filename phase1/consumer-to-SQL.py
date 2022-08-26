@@ -1,5 +1,14 @@
 from kafka import KafkaConsumer, TopicPartition
 from json import loads
+import mysql.connector
+import config
+
+mydb = mysql.connector.connect(
+    host= "localhost",
+    user= config.user,
+    password = config.password
+)
+
 
 class XactionConsumer:
     def __init__(self):
@@ -10,7 +19,7 @@ class XactionConsumer:
         ## These are two python dictionarys
         # Ledger is the one where all the transaction get posted
         self.ledger = {}
-        # custBalances is the one where the current blance of each customer
+        # custBalances is the one where the current balance of each customer
         # account is kept.
         self.custBalances = {}
         # THE PROBLEM is every time we re-run the Consumer, ALL our customer
@@ -24,7 +33,7 @@ class XactionConsumer:
             message = message.value
             print('{} received'.format(message))
             self.ledger[message['custid']] = message
-            # add message to the transaction table in your SQL usinf SQLalchemy
+            # add message to the transaction table in your SQL using SQLalchemy
             if message['custid'] not in self.custBalances:
                 self.custBalances[message['custid']] = 0
             if message['type'] == 'dep':
